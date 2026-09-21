@@ -1,0 +1,21 @@
+{
+  "words": ["toki", "pona"],
+  "ignorePaths": [
+    "./.claude/settings.json",
+    "./.devcontainer/devcontainer.json",
+    "./.vscode/settings.json",
+    ".venv/",
+    ".uv_cache/",
+    ".env",
+    ".env.example",
+    ".gitignore",
+    "cspell.json",
+    "pyproject.toml",
+    "pytest.toml",
+    "README.md",
+    "ruff.toml",
+    "Taskfile.yml",
+    "uv.lock"
+  ],
+  "useGitignore": false
+}

@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+tasks:
+  default:
+    desc: check を実行する。
+    cmds:
+      - task: check
+
+  check:
+    desc: すべての検査を実行する。
+    cmds:
+      - task: lint
+      - task: format
+      - task: type
+
+  lint:
+    desc: ruff で違反を検出する。
+    cmds:
+      - uv run ruff check .
+
+  format:
+    desc: ruff の format を確認する。
+    cmds:
+      - uv run ruff format --check .
+
+  type:
+    desc: mypy と pyright で型を検査する。
+    cmds:
+      - uv run mypy .
+      - uv run pyright --warnings .

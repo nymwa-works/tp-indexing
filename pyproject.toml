@@ -1,0 +1,114 @@
+# --- プロジェクト ---
+[project]
+name = "tp-indexing"
+version = "1.0"
+description = "トキポナの固有名詞で indexing"
+authors = [{ name = "Shota Koyama", email = "shotakoyama@nymwa.net" }]
+readme = "README.md"
+requires-python = ">=3.14,<4.0"
+dependencies = [
+    "pydantic>=2.13.5",
+    "pydantic-settings>=2.15.0",
+    "rich>=15.0.0",
+    "typer>=0.27.2",
+]
+
+# --- 開発時のみに必要なライブラリ ---
+[dependency-groups]
+dev = [
+    "mypy>=2.3.1",
+    "pyright>=1.1.414",
+    "ruff>=0.16.7",
+]
+
+# --- レポジトリのURL ---
+[project.urls]
+repository = "https://github.com/nymwa-works/tp-indexing"
+
+# --- ビルドシステムの定義 ---
+[build-system]
+requires = ["uv_build >= 0.12.5, <0.13.0"]
+build-backend = "uv_build"
+
+# --- uv の設定 ---
+[tool.uv]
+package = false
+exclude-newer = "1 week" # 直近1週間以内の変更はセキュリティーのために除外する。
+
+# --- 型チェッカー (mypy) の設定 ---
+[tool.mypy]
+strict = true
+
+# --- 型チェッカー (pyright) の設定 ---
+[tool.pyright]
+include = ["scripts"]
+exclude = ["**/node_modules", "**/typings", "**/__pycache__", "**/.*", ".venv"]
+typeCheckingMode = "strict"
+
+# typing.List などの非推奨エイリアスを reportDeprecated で検出する。
+deprecateTypingAliases = true
+
+# `# type: ignore` による一括抑制を禁止し、`# pyright: ignore[rule]` を強制する。
+enableTypeIgnoreComments = false
+
+# Off, Basic, Standard, Strictの順でのデフォルト値でルールを分類する。
+# warning, warning, warning, warning
+reportMissingModuleSource = "warning"
+
+# warning, error, error, error
+reportMissingImports = "error"
+
+# none, warning, warning, error
+reportUnusedExpression = "error"
+
+# none, none, error, error
+reportFunctionMemberAccess = "error"
+reportIncompatibleMethodOverride = "error"
+reportIncompatibleVariableOverride = "error"
+
+# none, none, none, error
+reportConstantRedefinition = "error"
+reportDeprecated = "error"
+reportDuplicateImport = "error"
+reportIncompleteStub = "error"
+reportInconsistentConstructor = "error"
+reportInvalidStubStatement = "error"
+reportMatchNotExhaustive = "error"
+reportMissingParameterType = "error"
+reportMissingTypeArgument = "error"
+reportMissingTypeStubs = "error"
+reportPrivateUsage = "error"
+reportTypeCommentUsage = "error"
+
+reportUnknownArgumentType = "error"
+reportUnknownLambdaType = "error"
+reportUnknownMemberType = "error"
+reportUnknownParameterType = "error"
+reportUnknownVariableType = "error"
+
+reportUnnecessaryCast = "error"
+reportUnnecessaryComparison = "error"
+reportUnnecessaryContains = "error"
+reportUnnecessaryIsInstance = "error"
+
+reportUnusedClass = "error"
+reportUnusedImport = "error"
+reportUnusedFunction = "error"
+reportUnusedVariable = "error"
+
+reportUntypedBaseClass = "error"
+reportUntypedClassDecorator = "error"
+reportUntypedFunctionDecorator = "error"
+reportUntypedNamedTuple = "error"
+
+# none, none, none, none
+reportCallInDefaultInitializer = "error"
+reportImplicitOverride = "error"
+reportImplicitStringConcatenation = "error"
+reportImportCycles = "error"
+reportMissingSuperCall = "error"
+reportPropertyTypeMismatch = "error"
+reportUninitializedInstanceVariable = "error"
+reportUnnecessaryTypeIgnoreComment = "error"
+reportUnreachable = "error"
+reportUnusedCallResult = "warning"

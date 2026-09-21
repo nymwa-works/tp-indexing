@@ -1,0 +1,131 @@
+# --- Linter & Formatter (ruff)の設定 ---
+
+line-length = 80
+target-version = "py314"
+
+[lint]
+preview = true
+select = [
+    "AIR",   # Airflow
+    "ERA",   # eradicate
+    "FAST",  # FastAPI
+    "YTT",   # flake8-2020
+    "ANN",   # flake8-annotations
+    "ASYNC", # flake8-async
+    "S",     # flake8-bandit
+    "BLE",   # flake8-blind-except
+    "FBT",   # flake8-boolean-trap
+    "B",     # flake8-bugbear
+    "A",     # flake8-builtins
+    "COM",   # flake8-commas
+    "C4",    # flake8-comprehensions
+    "DTZ",   # flake8-datetimez
+    "T10",   # flake8-debugger
+    "DJ",    # flake8-django
+    "EM",    # flake8-errmsg
+    "EXE",   # flake8-executable
+    "FIX",   # flake8-fixme
+    "FA",    # flake8-future-annotations
+    "INT",   # flake8-gettext
+    "ISC",   # flake8-implicit-str-concat
+    "ICN",   # flake8-import-conventions
+    "LOG",   # flake8-logging
+    "G",     # flake8-logging-format
+    "INP",   # flake8-no-pep420
+    "PIE",   # flake8-pie
+    "T20",   # flake8-print
+    "PYI",   # flake8-pyi
+    "PT",    # flake8-pytest-style
+    "Q",     # flake8-quotes
+    "RSE",   # flake8-raise
+    "RET",   # flake8-return
+    "SLF",   # flake8-self
+    "SIM",   # flake8-simplify
+    "SLOT",  # flake8-slots
+    "TID",   # flake8-tidy-imports
+    "TD",    # flake8-todo
+    "TC",    # flake8-type-checking
+    "ARG",   # flake8-unused-arguments
+    "PTH",   # flake8-use-pathlib
+    "FLY",   # flynt
+    "I",     # isort
+    "C90",   # mccabe
+    "NPY",   # NumPy-specific rules
+    "PD",    # pandas-vet
+    "N",     # pep8-naming
+    "PERF",  # Perflint
+    "E",     # pycodestyle error
+    "W",     # pycodestyle warning
+    # pydocstyle 100番台は、ドキュメントが必要な対象を定めるものなので、個別に有効化。
+    "D101", # pydocstyle undocumented-public-class
+    "D102", # pydocstyle undocumented-public-method
+    "D103", # pydocstyle undocumented-public-function
+    "D106", # pydocstyle undocumented-public-nested-class
+    "D2",   # pydocstyle 200番台は、スタイルを指定するものなので、原則有効化。
+    "D3",   # pydocstyle 300番台は、スタイルを指定するものなので、原則有効化。
+    "D4",   # pydocstyle 400番台は、スタイルを指定するものなので、原則有効化。
+    "F",    # Pyflakes
+    "PGH",  # pygrep-hooks
+    "PLC",  # Pylint Convention
+    "PLE",  # Pylint Error
+    "PLR",  # Pylint Refactor
+    "PLW",  # Pylint Warning
+    "UP",   # pyupgrade
+    "FURB", # refurb
+    "RUF",  # Ruff-specific rules
+    "TRY",  # tryceratops
+]
+
+ignore = [
+    # COM812 と ISC001 はフォーマッターと衝突するため無効化。
+    "COM812",
+    "ISC001",
+    # flake8-copyright は過剰なので無効化。
+    "CPY",
+    # pydoclint は過剰なので無効化。
+    # ArgsやReturnの説明を書くのは手間。
+    "DOC",
+    # pydocstyle undocumented-public-module は過剰なので無効化。
+    # ただし、モジュールレベルでの説明が必要な場合は、適宜書くようにする。
+    "D100",
+    # pydocstyle undocumented-public-package は過剰なので無効化。
+    # ただし、パッケージレベルでの説明が必要な場合は、適宜書くようにする。
+    "D104",
+    # pydocstyle undocumented-magic-method は過剰なので無効化。
+    # ほとんどのmagic methodは説明がなくても意図が伝わるため。
+    "D105",
+    # pydocstyle undocumented-public-init は過剰なので無効化。
+    # __init__メソッドの説明は、ほとんどの場合不要であるため。
+    "D107",
+    # D200番台は、他のルールと競合することあり、無効化する方を個別に指定する。
+    "D203", # D211と競合するため無効化。
+    "D212", # D213と競合するため無効化。
+    # D400番台は、英語以外に対応していないため、日本語環境では無効化する必要があるルールがある。
+    "D400", # 日本語の文末に"."でなく"。"を用いたい。(missing-trailing-period)
+    "D415", # 日本語の文末に"."でなく"。"を用いたい。(missing-terminal-punctuation)
+    # ambiguous unicode character を許可。（日本語が書けなくなるため。）
+    "RUF001",
+    "RUF002",
+    "RUF003",
+    # ルールコードを番号で指定する際の警告を無視する。（in preview のルールでなくなったら対応する。）
+    "RUF201",
+]
+
+[lint.per-file-ignores]
+# tests/ はテストコード置き場。テスト特有の作法を許可する。
+"scripts/**/*.py" = [
+    "INP",  # scripts/ では __init__.py が不要。
+    "S101", # scripts/ では assert を許可。
+]
+
+[lint.mccabe]
+max-complexity = 5
+
+[lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query"]
+
+[lint.flake8-type-checking]
+runtime-evaluated-base-classes = [
+    "pydantic.BaseModel",
+    "pydantic_settings.BaseSettings",
+]

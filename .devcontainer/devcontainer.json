@@ -1,0 +1,91 @@
+{
+  "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.base.schema.json",
+  // --- Dev Container for toki pona indexing Project ---
+  "name": "TP-Indexing Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/python:3.14-trixie",
+  // --- 開発コンテナに含める機能 ---
+  "features": {
+    // gh コマンド
+    "ghcr.io/devcontainers/features/github-cli": {},
+    // uv コマンド
+    "ghcr.io/devcontainers-extra/features/uv": {},
+    // task コマンド
+    "ghcr.io/devcontainers-extra/features/go-task": {},
+    // common-utils: 開発に必要なツール(git, curl, zsh, ...)をインストール
+    "ghcr.io/devcontainers/features/common-utils": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true
+    }
+  },
+  // --- 環境変数 ---
+  "containerEnv": {
+    // uv でライブラリのコピーが作成されwarningが出るのを防ぐ。
+    "UV_CACHE_DIR": "${containerWorkspaceFolder}/.uv_cache"
+  },
+  // --- コンテナ作成時に実行するコマンド ---
+  "remoteUser": "vscode",
+  "postCreateCommand": "git config core.hooksPath .githooks && uv sync --locked",
+  // --- VS Codeのカスタマイズ ---
+  "customizations": {
+    "vscode": {
+      // --- VS Code 拡張機能 ---
+      "extensions": [
+        // --- 言語・ファイル種別のサポート ---
+
+        // Python: 言語サーバー・デバッガー・環境管理。
+        "ms-python.python",
+        "ms-python.debugpy",
+        "ms-python.vscode-pylance",
+        "ms-python.vscode-python-envs",
+        // Python: リンター / フォーマッター。設定は ruff.toml。
+        "charliermarsh.ruff",
+        // Python: 型検査 (mypy)。
+        "ms-python.mypy-type-checker",
+
+        // TOML: pyproject.toml / ruff.toml / pytest.toml。
+        "tamasfe.even-better-toml",
+
+        // YAML: Taskfile.yml。
+        "redhat.vscode-yaml",
+
+        // Markdown: リンター。README.md など。
+        "davidanson.vscode-markdownlint",
+
+        // 上記以外 (JSON, JSONC, ...) のフォーマッター。
+        "esbenp.prettier-vscode",
+        "foxundermoon.shell-format",
+
+        // --- 開発ワークフロー ---
+
+        // AI アシスタント。
+        "anthropic.claude-code",
+        "openai.chatgpt",
+        "github.copilot",
+        "github.copilot-chat",
+        "google.geminicodeassist",
+
+        // タスクランナー。go-task feature と対になる。
+        "task.vscode-task",
+
+        // スペルチェック。辞書は cspell.json。
+        "streetsidesoftware.code-spell-checker",
+
+        // --- エディタ体験 ---
+
+        // 診断を行末にインライン表示する。pyright strict と相性が良い。
+        "usernamehw.errorlens",
+
+        // インデント階層の色分け。
+        "oderwat.indent-rainbow",
+
+        // ファイルアイコン。
+        "vscode-icons-team.vscode-icons"
+      ],
+      // --- VS Code 設定 ---
+      "settings": {
+        // イメージ側の既定が /usr/local/bin/python を指すため、uv の .venv に向け直す。
+        "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python"
+      }
+    }
+  }
+}

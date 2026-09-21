@@ -1,0 +1,90 @@
+{
+  //
+  // --- 共通設定 ---
+  //
+  // ファイル保存時にフォーマットを実行する。
+  "editor.formatOnSave": true,
+  // デフォルトのコードフォーマッターを Prettier に設定する。
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // 行末の余分な空白を自動削除する。
+  "files.trimTrailingWhitespace": true,
+  // ファイルの末尾に必ず改行を入れる (POSIX準拠)。
+  "files.insertFinalNewline": true,
+  // 改行コードを LF に統一する。(Windows 環境との差分を防ぐ。)
+  "files.eol": "\n",
+  // サイドバーのEXPLORERに表示しないファイルを指定する。
+  // 末尾に "/" を付けるとディレクトリに一致しなくなるため、付けないこと。
+  "files.exclude": {
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    "**/.uv_cache": true,
+    "**/.venv": true
+  },
+  // ファイル監視の対象から除外するファイルを指定する。
+  // .git は除外しない。除外するとソース管理ビューが自動更新されなくなる。
+  // (VS Code は既定で .git/objects などの重い部分だけを除外している。)
+  "files.watcherExclude": {
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    "**/.uv_cache": true,
+    "**/.venv": true,
+    "**/__pycache__": true
+  },
+  //
+  // --- Python 設定 ---
+  //
+  // Python 言語サーバーに Pylance を使用する。
+  "python.languageServer": "Pylance",
+  // 未インポートのモジュールも補完候補に出す。
+  "python.analysis.autoImportCompletions": true,
+  // 開いているファイルだけを解析する。全体の診断は task check で行う。
+  // workspace 全体を指定してしまうと、古い診断結果が更新されるのに時間がかかり、古い診断結果が残ったままになることがある。
+  "python.analysis.diagnosticMode": "openFilesOnly",
+  // -- インレイヒント (コード内に型などを薄く表示する。) --
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.pytestParameters": true,
+  // -- テスト --
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    // ruff.toml の line-length = 80 に合わせた目安線を引く。
+    "editor.rulers": [80],
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.ruff": "explicit",
+      "source.fixAll.ruff": "explicit"
+    }
+  },
+  //
+  // --- TOML 設定 ---
+  //
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  },
+  //
+  // --- Markdown 設定 ---
+  //
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    // Prettier の整形と markdownlint の規約が衝突しないよう、保存時に自動修正する。
+    "editor.codeActionsOnSave": {
+      "source.fixAll.markdownlint": "explicit"
+    }
+  },
+  //
+  // --- シェルスクリプト設定 ---
+  //
+  "[shellscript]": {
+    // Prettier はシェルスクリプトを扱えないため、shell-format を使う。
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  //
+  // --- TXT 設定 ---
+  //
+  "[plaintext]": {
+    // テキストファイルだけ折り返しをオンにする
+    "editor.wordWrap": "on"
+  }
+}
