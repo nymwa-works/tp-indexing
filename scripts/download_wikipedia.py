@@ -44,19 +44,33 @@ class AllPages(BaseModel):
 
 def main() -> None:
     """トキポナ版 Wikipedia から記事名の一覧を取得する。"""
-    titles = list(fetch_titles())
+    with new_client() as client:
+        titles = list(fetch_titles(client))
     _ = OUTPUT.write_text(
         json.dumps(titles, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
 
 
-def fetch_titles(limit: int = 500, wait: float = 1.0) -> Iterator[str]:
+def new_client(timeout: float = 60) -> httpx.Client:
+    """ページをまたいで接続を使い回すためのクライアントを作る。"""
+    return httpx.Client(
+        headers={"User-Agent": UA, "Accept": "application/json"},
+        timeout=timeout,
+        follow_redirects=True,
+    )
+
+
+def fetch_titles(
+    client: httpx.Client,
+    limit: int = 500,
+    wait: float = 1.0,
+) -> Iterator[str]:
     """MediaWiki API の allpages で記事名を順に取り出す。"""
     params = build_params(limit)
     while True:
         # GET リクエストを送信してレスポンスを取得する。
-        response = AllPages.model_validate_json(get(params))
+        response = AllPages.model_validate_json(get(client, params))
 
         # エラーが返ってきたら例外を投げる。
         if response.error:
@@ -91,15 +105,9 @@ def build_params(limit: int = 500) -> dict[str, str]:
     }
 
 
-def get(params: dict[str, str], timeout: float = 60) -> bytes:
+def get(client: httpx.Client, params: dict[str, str]) -> bytes:
     """GET して本文を返す。"""
-    response = httpx.get(
-        API,
-        params=params,
-        headers={"User-Agent": UA, "Accept": "application/json"},
-        timeout=timeout,
-        follow_redirects=True,
-    )
+    response = client.get(API, params=params)
     _ = response.raise_for_status()
     return response.content
 
