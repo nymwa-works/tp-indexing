@@ -1,5 +1,5 @@
 {
-  "words": ["toki", "pona"],
+  "words": ["lili", "linku", "lipu", "nimi", "pona", "suli", "toki"],
   "ignorePaths": [
     "./.claude/settings.json",
     "./.devcontainer/devcontainer.json",
@@ -10,6 +10,7 @@
     ".env.example",
     ".gitignore",
     "cspell.json",
+    "./data",
     "pyproject.toml",
     "pytest.toml",
     "README.md",
