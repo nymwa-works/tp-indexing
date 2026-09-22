@@ -1,5 +1,19 @@
 {
-  "words": ["lili", "linku", "lipu", "nimi", "pona", "suli", "toki"],
+  "words": [
+    "allpages",
+    "apfilterredir",
+    "aplimit",
+    "apnamespace",
+    "formatversion",
+    "lili",
+    "linku",
+    "lipu",
+    "nimi",
+    "nonredirects",
+    "pona",
+    "suli",
+    "toki"
+  ],
   "ignorePaths": [
     "./.claude/settings.json",
     "./.devcontainer/devcontainer.json",
