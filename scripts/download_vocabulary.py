@@ -24,14 +24,14 @@ def main() -> None:
 
 def fetch(timeout: float = 60) -> dict[str, str]:
     """`lipu Linku` の単語一覧の API からデータを取得する。"""
-    r = httpx.get(
+    response = httpx.get(
         API,
         headers={"User-Agent": UA, "Accept": "application/json"},
         timeout=timeout,
         follow_redirects=True,
     )
-    _ = r.raise_for_status()
-    return {k: v["book"] for k, v in r.json().items()}
+    _ = response.raise_for_status()
+    return {word: entry["book"] for word, entry in response.json().items()}
 
 
 def parse(
