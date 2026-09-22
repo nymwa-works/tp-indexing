@@ -1,5 +1,4 @@
 import json
-import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -45,7 +44,7 @@ class ApiError(BaseModel):
 class AllPages(BaseModel):
     """MediaWiki API の allpages のレスポンス"""
 
-    query: Query | None = None
+    query: Query = Field(default_factory=Query)
     error: ApiError | None = None
     continue_: dict[str, str] = Field(default_factory=dict, alias="continue")
     # continue は予約語で、構文解析に失敗するため、continue_ とする必要がある。
@@ -70,33 +69,26 @@ def new_client(timeout: float = 60) -> httpx.Client:
     )
 
 
-def fetch_titles(client: httpx.Client, wait: float = 1.0) -> Iterator[str]:
+def fetch_titles(client: httpx.Client) -> Iterator[str]:
     """MediaWiki API の allpages で記事名を順に取り出す。"""
-    params = PARAMS.copy()
+    continue_: dict[str, str] = {}
     while True:
-        # GET リクエストを送信してレスポンスを取得する。
-        response = client.get(API, params=params)
-        _ = response.raise_for_status()
-        pages = AllPages.model_validate_json(response.content)
-
-        # エラーが返ってきたら例外を投げる。
-        if pages.error:
-            msg = f"{pages.error.code}: {pages.error.info}"
-            raise RuntimeError(msg)
-
-        # クエリが存在していたら、タイトルを返す。
-        if pages.query:
-            yield from (page.title for page in pages.query.allpages)
-
-        # 続きがなければ終了する。
+        pages = fetch(client, PARAMS | continue_)
+        yield from (page.title for page in pages.query.allpages)
         if not pages.continue_:
             return
+        continue_ = pages.continue_
 
-        # これまで取得した分を params に記録する。
-        params.update(pages.continue_)
 
-        # 次のリクエストまで少し待つ。
-        time.sleep(wait)
+def fetch(client: httpx.Client, params: dict[str, str]) -> AllPages:
+    """1回分のリクエストを送り、検証したレスポンスを返す。"""
+    response = client.get(API, params=params)
+    _ = response.raise_for_status()
+    pages = AllPages.model_validate_json(response.content)
+    if pages.error:
+        msg = f"{pages.error.code}: {pages.error.info}"
+        raise RuntimeError(msg)
+    return pages
 
 
 if __name__ == "__main__":
