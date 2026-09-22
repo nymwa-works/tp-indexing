@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import httpx
-import typer
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -47,4 +46,4 @@ def parse(
 
 
 if __name__ == "__main__":
-    typer.run(main)
+    main()
