@@ -52,7 +52,11 @@ class AllPages(BaseModel):
 
 def main() -> None:
     """トキポナ版 Wikipedia から記事名の一覧を取得する。"""
-    with new_client() as client:
+    with httpx.Client(
+        headers={"User-Agent": UA, "Accept": "application/json"},
+        timeout=60,
+        follow_redirects=True,
+    ) as client:
         titles = list(fetch_titles(client))
     _ = OUTPUT.write_text(
         json.dumps(titles, ensure_ascii=False, indent=2) + "\n",
@@ -60,27 +64,20 @@ def main() -> None:
     )
 
 
-def new_client(timeout: float = 60) -> httpx.Client:
-    """ページをまたいで接続を使い回すためのクライアントを作る。"""
-    return httpx.Client(
-        headers={"User-Agent": UA, "Accept": "application/json"},
-        timeout=timeout,
-        follow_redirects=True,
-    )
-
-
 def fetch_titles(client: httpx.Client) -> Iterator[str]:
     """MediaWiki API の allpages で記事名を順に取り出す。"""
     continue_: dict[str, str] = {}
     while True:
-        pages = fetch(client, PARAMS | continue_)
+        pages = fetch_pages(client, PARAMS | continue_)
         yield from (page.title for page in pages.query.allpages)
+
+        # 続きがなければ終了する。
         if not pages.continue_:
             return
         continue_ = pages.continue_
 
 
-def fetch(client: httpx.Client, params: dict[str, str]) -> AllPages:
+def fetch_pages(client: httpx.Client, params: dict[str, str]) -> AllPages:
     """1回分のリクエストを送り、検証したレスポンスを返す。"""
     response = client.get(API, params=params)
     _ = response.raise_for_status()
