@@ -12,6 +12,15 @@ if TYPE_CHECKING:
 API = "https://tok.wikipedia.org/w/api.php"
 UA = "tp-indexing/1.0 (+https://github.com/nymwa-works/tp-indexing)"
 OUTPUT = Path(__file__).parent.parent / "data" / "titles.json"
+PARAMS = {
+    "action": "query",  # データを読むアクション
+    "list": "allpages",  # 全ページを列挙
+    "apnamespace": "0",  # 通常の記事 (0) が対象
+    "aplimit": "500",  # 1回のリクエストで 500 件取得する。
+    "format": "json",  # json で取得する。
+    "formatversion": "2",  # 最新のフォーマット (2) を使用する。
+    "apfilterredir": "nonredirects",  # リダイレクトを除外
+}
 
 
 class Page(BaseModel):
@@ -61,55 +70,33 @@ def new_client(timeout: float = 60) -> httpx.Client:
     )
 
 
-def fetch_titles(
-    client: httpx.Client,
-    limit: int = 500,
-    wait: float = 1.0,
-) -> Iterator[str]:
+def fetch_titles(client: httpx.Client, wait: float = 1.0) -> Iterator[str]:
     """MediaWiki API の allpages で記事名を順に取り出す。"""
-    params = build_params(limit)
+    params = PARAMS.copy()
     while True:
         # GET リクエストを送信してレスポンスを取得する。
-        response = AllPages.model_validate_json(get(client, params))
+        response = client.get(API, params=params)
+        _ = response.raise_for_status()
+        pages = AllPages.model_validate_json(response.content)
 
         # エラーが返ってきたら例外を投げる。
-        if response.error:
-            msg = f"{response.error.code}: {response.error.info}"
+        if pages.error:
+            msg = f"{pages.error.code}: {pages.error.info}"
             raise RuntimeError(msg)
 
         # クエリが存在していたら、タイトルを返す。
-        if response.query:
-            yield from (page.title for page in response.query.allpages)
+        if pages.query:
+            yield from (page.title for page in pages.query.allpages)
 
         # 続きがなければ終了する。
-        if not response.continue_:
+        if not pages.continue_:
             return
 
         # これまで取得した分を params に記録する。
-        params.update(response.continue_)
+        params.update(pages.continue_)
 
         # 次のリクエストまで少し待つ。
         time.sleep(wait)
-
-
-def build_params(limit: int = 500) -> dict[str, str]:
-    """Allpages 用のパラメータを構築する。"""
-    return {
-        "action": "query",  # データを読むアクション
-        "list": "allpages",  # 全ページを列挙
-        "apnamespace": "0",  # 通常の記事 (0) が対象
-        "aplimit": str(limit),  # 1回のリクエストで limit 件取得する。
-        "format": "json",  # json で取得する。
-        "formatversion": "2",  # 最新のフォーマット (2) を使用する。
-        "apfilterredir": "nonredirects",  # リダイレクトを除外
-    }
-
-
-def get(client: httpx.Client, params: dict[str, str]) -> bytes:
-    """GET して本文を返す。"""
-    response = client.get(API, params=params)
-    _ = response.raise_for_status()
-    return response.content
 
 
 if __name__ == "__main__":
