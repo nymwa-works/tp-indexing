@@ -1,12 +1,14 @@
 {
   "words": [
     "aeiou",
+    "aeou",
     "allpages",
     "apfilterredir",
     "aplimit",
     "apnamespace",
     "CVCV",
     "formatversion",
+    "jklmnpst",
     "jklmnpstw",
     "Levenshtein",
     "lili",
@@ -18,7 +20,8 @@
     "pona",
     "rapidfuzz",
     "suli",
-    "toki"
+    "toki",
+    "tokipona"
   ],
   "ignorePaths": [
     "./.claude/settings.json",
