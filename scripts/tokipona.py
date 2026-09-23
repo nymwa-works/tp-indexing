@@ -11,6 +11,13 @@ BANNED = ("ji", "ti", "wo", "wu")
 
 FIRST_CONSONANTS = "jklmnpst"
 FIRST_VOWELS = "aeou"
+FIRSTS = tuple(
+    consonant + vowel
+    for consonant in FIRST_CONSONANTS
+    for vowel in FIRST_VOWELS
+)
+"""第1音節に使える CV の組"""
+
 SECONDS = tuple(
     consonant + vowel
     for consonant in CONSONANTS
