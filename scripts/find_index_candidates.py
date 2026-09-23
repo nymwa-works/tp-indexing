@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from rapidfuzz.distance import Levenshtein
-from tokipona import FIRSTS, SECONDS, load_vocabulary
+from tokipona import load_syllables, load_vocabulary
 
 DATA = Path(__file__).parent.parent / "data"
 KNOWN_NAMES = DATA / "known_names.json"
@@ -15,10 +15,13 @@ def main() -> None:
     """索引に使える名前を集める。"""
     known = load_known_names()
     words = load_vocabulary()
+    syllables = load_syllables()
     candidates = [
         name
-        for name in build_names()
-        if name not in known and nearest(name, words) >= DISTANCE
+        for first in syllables
+        for second in syllables
+        if (name := first + second) not in known
+        and nearest(name, words) >= DISTANCE
     ]
     _ = OUTPUT.write_text(
         json.dumps(candidates, ensure_ascii=False, indent=2) + "\n",
@@ -30,16 +33,6 @@ def load_known_names() -> frozenset[str]:
     """既知の固有名をすべて小文字にして読み込む。"""
     names: list[str] = json.loads(KNOWN_NAMES.read_text(encoding="utf-8"))
     return frozenset(name.lower() for name in names)
-
-
-def build_names() -> list[str]:
-    """第一・二音節で子音が重複しない CVCV の形の名前をすべて生成する。"""
-    return [
-        first + second
-        for first in FIRSTS
-        for second in SECONDS
-        if first[0] != second[0]
-    ]
 
 
 def nearest(name: str, words: tuple[str, ...]) -> int:
