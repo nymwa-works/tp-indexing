@@ -24,7 +24,7 @@ BOOKS = ("pu", "ku suli")
 
 
 def load_vocabulary() -> tuple[str, ...]:
-    """採用する語を辞書順に読み込む。"""
+    """語彙を読み込む。"""
     books: dict[str, list[str]] = json.loads(
         VOCABULARY.read_text(encoding="utf-8"),
     )
