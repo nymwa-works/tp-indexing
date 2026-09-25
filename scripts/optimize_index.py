@@ -11,6 +11,7 @@ DATA = Path(__file__).parent.parent / "data"
 CANDIDATES = DATA / "index_candidates.json"
 KNOWN_NAMES = DATA / "known_names.json"
 OUTPUT = DATA / "index.json"
+OUTPUT_SCORE = DATA / "scored_index.json"
 
 WORKERS = 8
 """CP-SAT の並列実行数"""
@@ -51,8 +52,13 @@ def main() -> None:
     selected.sort(key=operator.itemgetter(1))
 
     # --- 出力 ---
-    text = json.dumps(selected, ensure_ascii=False, indent=2) + "\n"
+    text = (
+        json.dumps([n for n, _ in selected], ensure_ascii=False, indent=2)
+        + "\n"
+    )
+    scored = json.dumps(selected, ensure_ascii=False, indent=2) + "\n"
     _ = OUTPUT.write_text(text, encoding="utf-8")
+    _ = OUTPUT_SCORE.write_text(scored, encoding="utf-8")
 
 
 def groups_sharing_two_places(names: list[str]) -> list[list[str]]:
