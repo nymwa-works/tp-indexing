@@ -8,6 +8,19 @@ tasks:
     cmds:
       - task: check
 
+  fetch:
+    desc: 外部から語彙と記事名を取得する。
+    cmds:
+      - uv run scripts/download_vocabulary.py
+      - uv run scripts/download_titles.py
+
+  pipeline:
+    desc: 取得済みのデータから索引の固有名を決める。
+    cmds:
+      - uv run scripts/extract_known_names.py
+      - uv run scripts/find_index_candidates.py
+      - uv run scripts/optimize_index.py
+
   check:
     desc: すべての検査を実行する。
     cmds:
