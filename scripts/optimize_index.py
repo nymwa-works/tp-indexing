@@ -45,7 +45,7 @@ def main() -> None:
     # --- 実行 ---
     solver = solve(model)
     selected = [
-        (n.capitalize(), (farness(n, known_names)))
+        (n.capitalize(), [neighbors(n, known_names, d) for d in range(1, 4)])
         for n, f in flags.items()
         if solver.boolean_value(f)
     ]
@@ -73,6 +73,11 @@ def groups_sharing_two_places(names: list[str]) -> list[list[str]]:
 def farness(name: str, words: tuple[str, ...]) -> int:
     """その名前とすべての語との編集距離の合計を返す。"""
     return sum(Levenshtein.distance(name, word) for word in words)
+
+
+def neighbors(name: str, words: tuple[str, ...], distance: int) -> int:
+    """その名前との編集距離が distance の語の数を返す。"""
+    return sum(Levenshtein.distance(name, word) == distance for word in words)
 
 
 def solve(model: cp_model.CpModel) -> cp_model.CpSolver:
