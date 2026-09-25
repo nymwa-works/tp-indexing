@@ -22,7 +22,7 @@ NAME_LENGTH = 4
 def main() -> None:
     """候補の中から、索引に使う固有名を決める。"""
     names: list[str] = json.loads(CANDIDATES.read_text(encoding="utf-8"))
-    titles = tuple(
+    known_names = tuple(
         x.lower() for x in json.loads(KNOWN_NAMES.read_text(encoding="utf-8"))
     )
     words = load_vocabulary()
@@ -44,7 +44,7 @@ def main() -> None:
     # --- 実行 ---
     solver = solve(model)
     selected = [
-        (n.capitalize(), (farness(n, titles)))
+        (n.capitalize(), (farness(n, known_names)))
         for n, f in flags.items()
         if solver.boolean_value(f)
     ]
