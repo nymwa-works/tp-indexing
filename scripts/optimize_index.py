@@ -9,7 +9,7 @@ from tokipona import load_vocabulary
 
 DATA = Path(__file__).parent.parent / "data"
 CANDIDATES = DATA / "index_candidates.json"
-TITLES = DATA / "titles.json"
+KNOWN_NAMES = DATA / "known_names.json"
 OUTPUT = DATA / "index.json"
 
 WORKERS = 8
@@ -23,7 +23,7 @@ def main() -> None:
     """候補の中から、索引に使う固有名を決める。"""
     names: list[str] = json.loads(CANDIDATES.read_text(encoding="utf-8"))
     titles = tuple(
-        x.lower() for x in json.loads(TITLES.read_text(encoding="utf-8"))
+        x.lower() for x in json.loads(KNOWN_NAMES.read_text(encoding="utf-8"))
     )
     words = load_vocabulary()
     exclusive_groups = groups_sharing_two_places(names)
