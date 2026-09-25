@@ -1,5 +1,6 @@
 import itertools
 import json
+import operator
 from pathlib import Path
 
 from ortools.sat.python import cp_model
@@ -8,6 +9,7 @@ from tokipona import load_vocabulary
 
 DATA = Path(__file__).parent.parent / "data"
 CANDIDATES = DATA / "index_candidates.json"
+TITLES = DATA / "titles.json"
 OUTPUT = DATA / "index.json"
 
 WORKERS = 8
@@ -19,7 +21,10 @@ NAME_LENGTH = 4
 
 def main() -> None:
     """候補の中から、索引に使う固有名を決める。"""
-    names = json.loads(CANDIDATES.read_text(encoding="utf-8"))
+    names: list[str] = json.loads(CANDIDATES.read_text(encoding="utf-8"))
+    titles = tuple(
+        x.lower() for x in json.loads(TITLES.read_text(encoding="utf-8"))
+    )
     words = load_vocabulary()
     exclusive_groups = groups_sharing_two_places(names)
     model = cp_model.CpModel()
@@ -38,9 +43,16 @@ def main() -> None:
 
     # --- 実行 ---
     solver = solve(model)
-    selected = [n for n, f in flags.items() if solver.boolean_value(f)]
-    selected.sort()
-    write_result(selected)
+    selected = [
+        (n.capitalize(), (farness(n, titles)))
+        for n, f in flags.items()
+        if solver.boolean_value(f)
+    ]
+    selected.sort(key=operator.itemgetter(1))
+
+    # --- 出力 ---
+    text = json.dumps(selected, ensure_ascii=False, indent=2) + "\n"
+    _ = OUTPUT.write_text(text, encoding="utf-8")
 
 
 def groups_sharing_two_places(names: list[str]) -> list[list[str]]:
@@ -66,13 +78,6 @@ def solve(model: cp_model.CpModel) -> cp_model.CpSolver:
         msg = f"最適解が見つからない: {solver.status_name(status)}"
         raise RuntimeError(msg)
     return solver
-
-
-def write_result(names: list[str]) -> None:
-    """決まった固有名を JSON で書き出す。"""
-    names = [name.capitalize() for name in names]
-    text = json.dumps(names, ensure_ascii=False, indent=2) + "\n"
-    _ = OUTPUT.write_text(text, encoding="utf-8")
 
 
 if __name__ == "__main__":
